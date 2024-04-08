@@ -1,3 +1,5 @@
+using Microsoft.VisualBasic.CompilerServices;
+
 namespace APBD4REST;
 
 public class MockDb : IMockDb
@@ -25,36 +27,44 @@ public class MockDb : IMockDb
 
     public ICollection<Animal> GetAll()
     {
-        throw new NotImplementedException();
+        return _animals;
     }
 
     public Animal? GetById(int id)
     {
-        throw new NotImplementedException();
+        return _animals.FirstOrDefault(animal => animal.Id == id);
     }
 
     public void Add(Animal animal)
     {
-        throw new NotImplementedException();
+        _animals.Add(animal);
     }
 
-    public void Edit(Animal animal)
+    public void Edit(Animal animal, int id)
     {
-        throw new NotImplementedException();
+        var searchedAnimal = _animals.SingleOrDefault(a => a.Id == id);
+        if (searchedAnimal != null)
+        {
+            searchedAnimal.Category = animal.Category;
+            searchedAnimal.Color = animal.Color;
+            searchedAnimal.Name = animal.Name;
+            searchedAnimal.Weight = animal.Weight;
+        }
     }
 
     public void Delete(int id)
     {
-        throw new NotImplementedException();
+        var searchedAnimal = _animals.SingleOrDefault(a => a.Id == id);
+        if (searchedAnimal != null) _animals.Remove(searchedAnimal);
     }
 
     public ICollection<Visit> GettAllVisits()
     {
-        throw new NotImplementedException();
+        return _visits;
     }
 
     public void AddVisit(Visit visit)
     {
-        throw new NotImplementedException();
+        _visits.Add(visit);
     }
 }

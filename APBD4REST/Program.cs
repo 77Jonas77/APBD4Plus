@@ -40,8 +40,7 @@ app.MapPut("/animals/{id}", (IMockDb mockDb, int id, Animal animal) =>
     if (mockDb.GetById(id) is null)
         return Results.NotFound();
 
-    animal.Id = id;
-    mockDb.Edit(animal);
+    mockDb.Edit(animal, id);
     return Results.Ok();
 });
 
@@ -54,12 +53,9 @@ app.MapDelete("/animals/{id}", (IMockDb mockDb, int id) =>
     return Results.Ok();
 });
 
-app.MapGet("/animals/visits", (IMockDb mockDb) =>
-{
-    Results.Ok(mockDb.GettAllVisits());
-});
+app.MapGet("/visits", (IMockDb mockDb) => Results.Ok(mockDb.GettAllVisits()));
 
-app.MapPost("/animals/visits", (IMockDb mockDb, Visit visit) =>
+app.MapPost("/visits", (IMockDb mockDb, Visit visit) =>
 {
     mockDb.AddVisit(visit);
     return Results.Created();
