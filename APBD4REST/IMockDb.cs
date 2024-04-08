@@ -7,5 +7,6 @@ public interface IMockDb
     public void Add(Animal animal);
     public void Edit(Animal animal);
     public void Delete(int id);
-    
+    public ICollection<Visit> GettAllVisits();
+    public void AddVisit(Visit visit);
 }
