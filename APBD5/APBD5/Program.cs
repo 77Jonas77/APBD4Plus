@@ -1,11 +1,17 @@
+using APBD5.Repositories;
+using APBD5.Services;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
 //builder.Services.RegisterValidators();
 builder.Services.AddControllers();
+builder.Services.AddScoped<IAnimalsRepository, AnimalsRepository>();
+builder.Services.AddScoped<IAnimalsService, AnimalsService>();
 
 var app = builder.Build();
 
@@ -17,9 +23,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
-//app.RegisterStudentsEndpoints();
-//app.RegisterStudentsDapperEndpoints();
 app.MapControllers();
+
 
 app.Run();
