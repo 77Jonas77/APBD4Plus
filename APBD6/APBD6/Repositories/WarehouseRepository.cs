@@ -1,5 +1,6 @@
 using System.Data.Common;
 using System.Data.SqlClient;
+using System.Runtime.InteropServices;
 using APBD6.DTOs;
 
 namespace APBD6.Repositories;
@@ -32,8 +33,9 @@ public class WarehouseRepository(IConfiguration configuration) : IWarehouseRepos
         ;
         if ((orderId = (int)(await GetValidOrderMatchingAsync(con, productFullfillOrderData.IdProduct,
                 productFullfillOrderData.Amount,
-                productFullfillOrderData.CreatedAt))!) != -1)
+                productFullfillOrderData.CreatedAt))!) == -1)
         {
+            
             throw new ArgumentException(
                 $"Order with given data ID: {productFullfillOrderData.IdProduct}, AMOUNT: {productFullfillOrderData.Amount} does not exists!");
         }
@@ -47,20 +49,52 @@ public class WarehouseRepository(IConfiguration configuration) : IWarehouseRepos
         // #4 transaction
         var transaction = await con.BeginTransactionAsync();
         await UpdateFullfilledAtAsync(con, transaction, orderId);
-        var id = await InsertNewRecordIntoProductWarehouse(con, transaction, productFullfillOrderData, orderId);
-        await transaction.RollbackAsync();
-        //await transaction.CommitAsync();
-        return (int)id;
+        var id = await InsertNewRecordIntoProductWarehouseAsync(con, transaction, productFullfillOrderData, orderId);
+        //await transaction.RollbackAsync();
+        await transaction.CommitAsync();
+        return id;
     }
 
-    private async Task<int> InsertNewRecordIntoProductWarehouse(SqlConnection con, DbTransaction transaction, ProductFullfillOrderData productFullfillOrderData, int orderId)
+    private async Task<int> InsertNewRecordIntoProductWarehouseAsync(SqlConnection con, DbTransaction transaction,
+        ProductFullfillOrderData productFullfillOrderData, int orderId)
     {
-        throw new NotImplementedException();
+        await using var cmd = new SqlCommand();
+        cmd.CommandText =
+            $"INSERT INTO Product_Warehouse (IdWarehouse,IdProduct, IdOrder, Amount, Price, CreatedAt) VALUES (@1,@2,@3,@4,@5,SYSDATETIME()); " +
+            $"SELECT CONVERT(INT, SCOPE_IDENTITY());";
+        
+        var productPrice = await GetPriceOfProductAsync(con, transaction, productFullfillOrderData.IdProduct);
+        cmd.Parameters.AddWithValue("@1", productFullfillOrderData.IdWarehouse);
+        cmd.Parameters.AddWithValue("@2", productFullfillOrderData.IdProduct);
+        cmd.Parameters.AddWithValue("@3", orderId);
+        cmd.Parameters.AddWithValue("@4", productFullfillOrderData.Amount);
+        cmd.Parameters.AddWithValue("@5", productPrice * productFullfillOrderData.Amount);
+        cmd.Connection = con;
+        cmd.Transaction = (SqlTransaction)transaction;
+
+        var resInsert = (int?)await cmd.ExecuteScalarAsync();
+        return (int)resInsert!;
+    }
+
+    private async Task<decimal> GetPriceOfProductAsync(SqlConnection con, DbTransaction transaction, int idProduct)
+    {
+        await using var cmd = new SqlCommand();
+        cmd.CommandText = $"SELECT Price FROM Product WHERE IdProduct = {idProduct}";
+        cmd.Connection = con;
+        cmd.Transaction = (SqlTransaction)transaction;
+
+        var priceRes = await cmd.ExecuteScalarAsync();
+        return (decimal)priceRes!;
     }
 
     private async Task UpdateFullfilledAtAsync(SqlConnection con, DbTransaction transaction, int orderId)
     {
-        throw new NotImplementedException();
+        await using var cmd = new SqlCommand();
+        cmd.CommandText = $"UPDATE [Order] SET FulfilledAt = SYSDATETIME() WHERE IdOrder = {orderId}";
+
+        cmd.Connection = con;
+        cmd.Transaction = (SqlTransaction)transaction;
+        await cmd.ExecuteNonQueryAsync();
     }
 
     private async Task<bool> IsOrderInWarehouseAsync(SqlConnection con, int idOrder)
@@ -80,11 +114,10 @@ public class WarehouseRepository(IConfiguration configuration) : IWarehouseRepos
     {
         await using var cmd = new SqlCommand();
         cmd.CommandText =
-            $"SELECT IdOrder FROM [Order] WHERE IdProduct = {idProduct} AND Amount = {amount} AND CreatedAt < {createdAt} AND FulfilledAt IS NULL";
+            $"SELECT IdOrder FROM [Order] WHERE IdProduct = {idProduct} AND Amount = {amount} AND FulfilledAt IS NULL";
         cmd.Connection = con;
-
+    
         var orderResId = (int?)(await cmd.ExecuteScalarAsync() ?? -1);
-
         return orderResId;
     }
 
