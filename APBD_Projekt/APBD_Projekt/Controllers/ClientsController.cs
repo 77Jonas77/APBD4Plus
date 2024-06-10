@@ -11,6 +11,7 @@ public class ClientsController(IClientService clientService) : ControllerBase
     [HttpPost("/add/physical")]
     public async Task<IActionResult> AddClientAsPhysicalAsync(CreateClientAsPhysicalRequestDto clientData)
     {
+        //czy trzeba sprawdzac imie/nazwisko?
         return Ok();
     }
 
@@ -33,7 +34,7 @@ public class ClientsController(IClientService clientService) : ControllerBase
     }
 
     [HttpPut("/update/company")]
-    public async Task<IActionResult> UpdatePhysicalClientDataWithIdAsync(UpdateCompanyClientRequestDto clientData)
+    public async Task<IActionResult> UpdateCompanyClientDataWithIdAsync(UpdateCompanyClientRequestDto clientData)
     {
         return Ok();
     }

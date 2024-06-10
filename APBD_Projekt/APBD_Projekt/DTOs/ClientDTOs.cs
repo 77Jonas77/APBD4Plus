@@ -11,7 +11,7 @@ public record CreateClientAsPhysicalRequestDto
     [MaxLength(50)]
     public required string Email { get; set; }
 
-    [Required] [MaxLength(9)] public required string TelephoneNumber { get; set; }
+    [Required] [StringLength(9)] public required string TelephoneNumber { get; set; }
 
     [Required] [MaxLength(100)] public required string Name { get; set; }
 
@@ -29,7 +29,7 @@ public record CreateClientAsCompanyRequestDto
     [MaxLength(50)]
     public required string Email { get; set; }
 
-    [Required] [MaxLength(9)] public required string TelephoneNumber { get; set; }
+    [Required] [StringLength(9)] public required string TelephoneNumber { get; set; }
 
     [Required] [MaxLength(100)] public required string CompanyName { get; set; }
 
@@ -42,7 +42,7 @@ public record UpdatePhysicalClientRequestDto
 
     [EmailAddress] [MaxLength(50)] public string? Email { get; set; }
 
-    [MaxLength(9)] public string? TelephoneNumber { get; set; }
+    [StringLength(9)] public string? TelephoneNumber { get; set; }
 
     [MaxLength(100)] public string? Name { get; set; }
 
@@ -55,7 +55,7 @@ public record UpdateCompanyClientRequestDto
 
     [EmailAddress] [MaxLength(50)] public string? Email { get; set; }
 
-    [MaxLength(9)] public string? TelephoneNumber { get; set; }
+    [StringLength(9)] public string? TelephoneNumber { get; set; }
 
     [MaxLength(100)] public string? CompanyName { get; set; }
 }
