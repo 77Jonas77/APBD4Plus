@@ -8,20 +8,32 @@ namespace APBD_Projekt.Controllers;
 [Route("clients/")]
 public class ClientController(IClientService clientService) : ControllerBase
 {
-    [HttpPost("/add")]
-    public async Task<IActionResult> AddClientAsync(CreateClientRequestDto clientData)
+    [HttpPost("/add/physical")]
+    public async Task<IActionResult> AddClientAsPhysicalAsync(CreateClientAsPhysicalRequestDto clientData)
     {
         return Ok();
     }
 
-    [HttpDelete("/delete/{clientId:int}")]
-    public async Task<IActionResult> RemoveClientWithIdAsync(int clientId)
+    [HttpPost("/add/company")]
+    public async Task<IActionResult> AddClientAsCompanyAsync(CreateClientAsCompanyRequestDto clientData)
     {
         return Ok();
     }
 
-    [HttpPut("/update")]
-    public async Task<IActionResult> UpdateClientDataWithIdAsync(CreateClientRequestDto clientData)
+    [HttpDelete("/delete/physical/{clientId:int}")]
+    public async Task<IActionResult> RemovePhysicalClientWithIdAsync(int clientId)
+    {
+        return Ok();
+    }
+
+    [HttpPut("/update/physical")]
+    public async Task<IActionResult> UpdatePhysicalClientDataWithIdAsync(UpdatePhysicalClientRequestDto clientData)
+    {
+        return Ok();
+    }
+
+    [HttpPut("/update/company")]
+    public async Task<IActionResult> UpdatePhysicalClientDataWithIdAsync(UpdateCompanyClientRequestDto clientData)
     {
         return Ok();
     }
