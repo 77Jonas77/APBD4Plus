@@ -6,7 +6,7 @@ namespace APBD_Projekt.Controllers;
 
 [ApiController]
 [Route("clients/")]
-public class ClientController(IClientService clientService) : ControllerBase
+public class ClientsController(IClientService clientService) : ControllerBase
 {
     [HttpPost("/add/physical")]
     public async Task<IActionResult> AddClientAsPhysicalAsync(CreateClientAsPhysicalRequestDto clientData)
